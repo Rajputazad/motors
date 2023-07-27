@@ -46,6 +46,8 @@ dependencies:
   flutter_animated_dialog: ^2.0.1
   url_launcher: ^6.1.12
   share_plus: ^7.0.2
+  permission_handler: ^10.4.3
+  path_provider: ^2.0.15
 
 dev_dependencies:
   flutter_test:

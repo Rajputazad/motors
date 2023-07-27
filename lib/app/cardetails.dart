@@ -9,6 +9,9 @@ import 'package:intl/intl.dart';
 import 'package:motors/tools/dailog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Cardetails extends StatefulWidget {
   final String id;
@@ -125,6 +128,52 @@ class _CardetailsState extends State<Cardetails> {
     await Share.share(textToShare);
   }
 
+  Future<void> _downloadImage(BuildContext context) async {
+    try {
+      // Check if storage permission is granted
+      if (await Permission.storage.request().isGranted) {
+        // Fetch the image
+        for (int i = 0; i < images.length; i++) {
+          final response = await http.get(Uri.parse(images[i]));
+          if (response.statusCode == 200) {
+            // Get the app's document directory
+            final appDocDir = await getApplicationDocumentsDirectory();
+            // ignore: unnecessary_brace_in_string_interps
+            final fileName = 'downloaded_image${i}.jpg';
+            final file = File('${appDocDir.path}/$fileName');
+
+            // Save the image to the app's document directory
+            await file.writeAsBytes(response.bodyBytes);
+
+            // Show a success message to the user
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Image downloaded successfully.')),
+            );
+          } else {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to download image")),
+      );
+            throw Exception('Failed to download image');
+          }
+        }
+      } else {
+        // ignore: use_build_context_synchronously
+         ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Storage permission not granted')),
+      );
+        throw Exception('Storage permission not granted');
+      }
+    } catch (e) {
+      // Handle errors if any
+      logger.d('Error downloading image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error downloading image.')),
+      );
+    }
+  }
+
   // void _makePhoneCall(String phoneNumber) async {
   //   // ignore: deprecated_member_use
   //   // if (await canLaunch(phoneNumber)) {
@@ -222,7 +271,12 @@ class _CardetailsState extends State<Cardetails> {
                                     fontWeight: FontWeight.bold, fontSize: 20),
                               ),
                               // Spacer(),
-                              const SizedBox(width: 100),
+                              const SizedBox(width: 50),
+                              IconButton(
+                                icon: const Icon(Icons
+                                    .file_download), // Use the appropriate download icon
+                                onPressed: () => _downloadImage(context),
+                              ),
                               IconButton(
                                 icon: const Icon(Icons.share),
                                 onPressed: () => _shareData(context),
