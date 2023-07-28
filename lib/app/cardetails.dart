@@ -9,9 +9,16 @@ import 'package:intl/intl.dart';
 import 'package:motors/tools/dailog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+// import 'dart:io';
+// import 'package:path_provider/path_provider.dart';
+// import 'package:flutter_downloader/flutter_downloader.dart';
+// import 'package:open_file/open_file.dart';
+// import 'package:flutter_downloader/flutter_downloader.dart';
+// import 'package:flowder/flowder.dart';
+// import 'package:percent_indicator/percent_indicator.dart';
 
 class Cardetails extends StatefulWidget {
   final String id;
@@ -127,52 +134,90 @@ class _CardetailsState extends State<Cardetails> {
     // Share the data using the share_plus package
     await Share.share(textToShare);
   }
+//   Future<void> openDownloadedFile(String filePath) async {
+//   await OpenFile.open(filePath);
+// }
+// Future<void> _downloadImage(BuildContext context, String fileUrl) async {
+//   try {
+//     final response = await http.get(Uri.parse(fileUrl));
+//     if (response.statusCode == 200) {
+//       final fileName = fileUrl.split('/').last;
+//       final downloadsDirectory = await DownloadsPathProvider.downloadsDirectory;
+//       final filePath = '${downloadsDirectory.path}/$fileName';
 
-  Future<void> _downloadImage(BuildContext context) async {
-    try {
-      // Check if storage permission is granted
-      if (await Permission.storage.request().isGranted) {
-        // Fetch the image
-        for (int i = 0; i < images.length; i++) {
-          final response = await http.get(Uri.parse(images[i]));
-          if (response.statusCode == 200) {
-            // Get the app's document directory
-            final appDocDir = await getApplicationDocumentsDirectory();
-            // ignore: unnecessary_brace_in_string_interps
-            final fileName = 'downloaded_image${i}.jpg';
-            final file = File('${appDocDir.path}/$fileName');
+//       File file = File(filePath);
+//       await file.writeAsBytes(response.bodyBytes);
 
-            // Save the image to the app's document directory
-            await file.writeAsBytes(response.bodyBytes);
-
-            // Show a success message to the user
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Image downloaded successfully.')),
-            );
-          } else {
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to download image")),
-      );
-            throw Exception('Failed to download image');
-          }
-        }
-      } else {
-        // ignore: use_build_context_synchronously
-         ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Storage permission not granted')),
-      );
-        throw Exception('Storage permission not granted');
-      }
-    } catch (e) {
-      // Handle errors if any
-      logger.d('Error downloading image: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error downloading image.')),
-      );
-    }
-  }
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('File downloaded successfully.')),
+//       );
+//     } else {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text("Failed to download file")),
+//       );
+//       throw Exception('Failed to download file');
+//     }
+//   } catch (e) {
+//     debugPrint('Error downloading file: $e');
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(content: Text('Error downloading file.')),
+//     );
+//   }
+// }
+  // Future<void> _downloadImage(BuildContext context) async {
+  //   try {
+  //     // Check if storage permission is granted
+  //     if (await Permission.storage.request().isGranted) {
+  //       // Fetch the image
+  //       // for (int i = 0; i < images.length; i++) {
+  //         final response = await http.get(Uri.parse(images[0]));
+  //         if (response.statusCode == 200) {
+  //           // Get the app's document directory
+  //           final appDocDir = await getApplicationDocumentsDirectory();
+  //           logger.d(appDocDir);
+  //           // ignore: unnecessary_brace_in_string_interps
+  //           final fileName = 'downloaded_image${DateTime.now().millisecondsSinceEpoch}.jpg';
+  //           final file = File('${appDocDir.path}/$fileName');
+  //           final String downloadPath = appDocDir.path;
+  //           logger.d(downloadPath);
+  //           // Save the image to the app's document directory
+  //           await file.writeAsBytes(response.bodyBytes);
+  //           openDownloadedFile(downloadPath);
+  //           // await FlutterDownloader.enqueue(
+  //           //   url: images[0],
+  //           //   savedDir: downloadPath,
+  //           //   fileName: fileName,
+  //           //   showNotification: true,
+  //           //   openFileFromNotification: true,
+  //           // );
+  //           // Show a success message to the user
+  //           // ignore: use_build_context_synchronously
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(content: Text('Image downloaded successfully.')),
+  //           );
+  //         } else {
+  //           // ignore: use_build_context_synchronously
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(content: Text("Failed to download image")),
+  //           );
+  //           throw Exception('Failed to download image');
+  //         }
+  //       // }
+  //     } else {
+  //       // ignore: use_build_context_synchronously
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Storage permission not granted')),
+  //       );
+  //       throw Exception('Storage permission not granted');
+  //     }
+  //   } catch (e) {
+  //     // Handle errors if any
+  //     logger.d('Error downloading image: $e');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Error downloading image.')),
+  //     );
+  //   }
+  // }
 
   // void _makePhoneCall(String phoneNumber) async {
   //   // ignore: deprecated_member_use
@@ -183,6 +228,42 @@ class _CardetailsState extends State<Cardetails> {
   //   //   throw 'Could not launch $phoneNumber';
   //   // }
   // }
+  late double? _progress;
+
+  Future<void> _downloadImage() async {
+    if (await Permission.storage.request().isGranted) {
+      // Permission granted. You can now save files to external storage.
+      //  logger.d(images[0]);
+      try {
+        for (int i = 0; i < images.length; i++) {
+          await FileDownloader.downloadFile(
+              url: images[i],
+              onProgress: (name, progress) {
+                setState(() {
+                  _progress = progress;
+                });
+              },
+              onDownloadCompleted: (value) {
+                logger.d(value);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Image downloaded successfully.')),
+                );
+              });
+        }
+      } on Exception catch (e) {
+        logger.d(e);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error downloading image.')),
+        );
+      }
+    } else {
+      // Permission denied. Handle this situation accordingly.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Storage permission not granted')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -275,7 +356,7 @@ class _CardetailsState extends State<Cardetails> {
                               IconButton(
                                 icon: const Icon(Icons
                                     .file_download), // Use the appropriate download icon
-                                onPressed: () => _downloadImage(context),
+                                onPressed: () => _downloadImage(),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.share),
@@ -334,8 +415,8 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.center,
-                                                child:
-                                                    Text(cardetals["model"])),
+                                                child: SelectableText(
+                                                    cardetals["model"])),
                                           ]),
                                     ),
                                   ),

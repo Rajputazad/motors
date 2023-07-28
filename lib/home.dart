@@ -7,7 +7,6 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:motors/app/cardetails.dart';
-
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -92,9 +91,14 @@ class _HomeState extends State<Home> {
           // cardata = cardata.reversed.toList();
 
           if (data["data"].length == 0) {
-            add = false;
+            setState(() {
+              add = false;
+            });
           } else {
-            add = true;
+            setState(() {
+              add = true;
+            });
+
             // logger.d(data["data"].length == 0);
           }
         });
@@ -103,6 +107,11 @@ class _HomeState extends State<Home> {
       setState(() {
         loding = true;
       });
+      // ignore: use_build_context_syn'chronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        // ignore: prefer_interpolation_to_compose_strings
+        const SnackBar(content: Text( "error")),
+      );
       logger.d(e);
     }
     // logger.d(apiurl);
