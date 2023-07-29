@@ -7,6 +7,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:motors/app/cardetails.dart';
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -15,11 +16,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  late final TextEditingController _search = TextEditingController();
   bool loding = true;
   final logger = Logger();
   late List<Map<String, dynamic>> cardata = [];
   final apiurl = dotenv.get('API_URL');
   final getcar = dotenv.get('API_URL_GET');
+  final getsearch = dotenv.get('API_URL_SEARCH');
   final color = const Color.fromARGB(255, 0, 102, 185);
   @override
   void initState() {
@@ -52,6 +55,7 @@ class _HomeState extends State<Home> {
 
   late bool add = true;
   late bool content;
+
   final ScrollController _scrollController = ScrollController();
   void _scrollListener() async {
     content = true;
@@ -78,6 +82,7 @@ class _HomeState extends State<Home> {
     try {
       var pag = page.toString();
       var url = Uri.parse(apiurl + getcar + pag);
+
       logger.d(url);
       var result = await http.get(url);
       if (result.statusCode == 200) {
@@ -110,12 +115,48 @@ class _HomeState extends State<Home> {
       // ignore: use_build_context_syn'chronously
       ScaffoldMessenger.of(context).showSnackBar(
         // ignore: prefer_interpolation_to_compose_strings
-        const SnackBar(content: Text( "error")),
+        const SnackBar(content: Text("Please check your internet connection and restart the app.")),
       );
       logger.d(e);
     }
     // logger.d(apiurl);
     // print(apiurl);
+  }
+
+  bool nodata = false;
+  search() async {
+    //  loding = false;
+    content = false;
+    logger.d(_search.text);
+    try {
+      var uri = Uri.parse(apiurl + getsearch + _search.text);
+      var res = await http.get(uri);
+      logger.d(uri);
+
+      if (res.statusCode == 200) {
+        var data = jsonDecode(res.body);
+        var jsonData = data["data"];
+        setState(() {
+          cardata = jsonData.cast<Map<String, dynamic>>();
+          if (cardata.isEmpty) {
+            nodata = true;
+          } else {
+            nodata = false;
+          }
+          logger.d(cardata);
+        });
+      } else {
+        logger.d(res.body);
+        // cardata = [];
+        // page = 1;
+        _refreshIndicatorKey.currentState?.show();
+      }
+    } on Exception catch (e) {
+      logger.d(e);
+      // cardata = [];
+      // page = 1;
+      _refreshIndicatorKey.currentState?.show();
+    }
   }
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
@@ -146,6 +187,7 @@ class _HomeState extends State<Home> {
                   constraints: const BoxConstraints(maxWidth: 200.0),
                   height: 35,
                   child: TextField(
+                    controller: _search,
                     decoration: InputDecoration(
                       hintText: 'Search...',
                       hintStyle: TextStyle(color: color),
@@ -163,8 +205,11 @@ class _HomeState extends State<Home> {
                     ),
                     textInputAction: TextInputAction.search,
                     onSubmitted: (value) {
-                      // on();
+                      search();
                       // Handle search query submitted
+                    },
+                    onChanged: (String value) {
+                      search();
                     },
                   ),
                 ),
@@ -201,177 +246,203 @@ class _HomeState extends State<Home> {
                           onRefresh: () async {
                             // Replace this delay with the code to be executed during refresh
                             // and return a Future when code finishes execution.
+                            nodata = false;
+
+                            cardata = [];
+                            page = 1;
                             await getcars();
                             // return Future<void>.delayed(const Duration(seconds: 3));
                           },
-                          child: ListView.builder(
-                              physics: const BouncingScrollPhysics(),
-                              controller: _scrollController,
-                              itemCount: cardata.length + 1,
-                              itemBuilder: (BuildContext context, int index) {
-                                if (index == cardata.length) {
-                                  return content
-                                      ? Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 10, bottom: 10),
-                                          child: Center(
-                                            child: LoadingAnimationWidget
-                                                .staggeredDotsWave(
-                                              color: color,
-                                              size: 35,
-                                            ),
-                                          ),
-                                        )
-                                      : null;
-                                }
-                                final car = cardata[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 10.0, left: 10, right: 10),
-                                  child: Card(
-                                    elevation:
-                                        2, // Set the elevation for the card
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          10), // Set the border radius for the card
-                                    ),
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  Cardetails(id: car["_id"])),
-                                        );
-                                      },
-                                      child: SizedBox(
-                                        // color: Colors.amber,
-                                        width: 410,
-                                        height: 80,
-                                        // child: Expanded(
-                                        child: Row(
-                                          children: [
-                                            showContainer
-                                                ? Expanded(
-                                                    child: Shimmer.fromColors(
-                                                      baseColor:
-                                                          Colors.grey[300]!,
-                                                      highlightColor:
-                                                          Colors.grey[100]!,
-                                                      child: Card(
-                                                        elevation: 1.0,
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
+                          child: nodata
+                              ? const Center(
+                                  child: Text(
+                                  "No data found",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ))
+                              : ListView.builder(
+                                  physics: const BouncingScrollPhysics(),
+                                  controller: _scrollController,
+                                  itemCount: cardata.length + 1,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    if (index == cardata.length) {
+                                      return content
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10, bottom: 10),
+                                              child: Center(
+                                                child: LoadingAnimationWidget
+                                                    .staggeredDotsWave(
+                                                  color: color,
+                                                  size: 35,
+                                                ),
+                                              ),
+                                            )
+                                          : null;
+                                    }
+                                    final car = cardata[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10.0, left: 10, right: 10),
+                                      child: Card(
+                                        elevation:
+                                            2, // Set the elevation for the card
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10), // Set the border radius for the card
+                                        ),
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      Cardetails(
+                                                          id: car["_id"])),
+                                            );
+                                          },
+                                          child: SizedBox(
+                                            // color: Colors.amber,
+                                            width: 410,
+                                            height: 80,
+                                            // child: Expanded(
+                                            child: Row(
+                                              children: [
+                                                showContainer
+                                                    ? Expanded(
+                                                        child:
+                                                            Shimmer.fromColors(
+                                                          baseColor:
+                                                              Colors.grey[300]!,
+                                                          highlightColor:
+                                                              Colors.grey[100]!,
+                                                          child: Card(
+                                                            elevation: 1.0,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            ),
+                                                            child:
+                                                                const SizedBox(
+                                                              height: 80,
+                                                              // width: 80,
+                                                            ),
+                                                          ),
                                                         ),
-                                                        child: const SizedBox(
-                                                          height: 80,
-                                                          // width: 80,
+                                                      )
+                                                    : SizedBox(
+                                                        height: 80,
+                                                        width: 141,
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                  10.0), // Set the border radius value
+                                                          child: car["imagedetails"] !=
+                                                                      null &&
+                                                                  car["imagedetails"]
+                                                                      .isNotEmpty
+                                                              ? Image.network(
+                                                                  car["imagedetails"]
+                                                                          [0]
+                                                                      ["url"])
+                                                              : Image.asset(
+                                                                  'assets/images/1.jpeg'), // Replace with your image asset path
                                                         ),
                                                       ),
-                                                    ),
-                                                  )
-                                                : SizedBox(
-                                                    height: 80,
-                                                    width: 141,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0), // Set the border radius value
-                                                      child: car["imagedetails"] !=
-                                                                  null &&
-                                                              car["imagedetails"]
-                                                                  .isNotEmpty
-                                                          ? Image.network(
-                                                              car["imagedetails"]
-                                                                  [0]["url"])
-                                                          : Image.asset(
-                                                              'assets/images/1.jpeg'), // Replace with your image asset path
-                                                    ),
-                                                  ),
-                                            // child: Image(image: AssetImage("assets/images/1.jpeg")),
+                                                // child: Image(image: AssetImage("assets/images/1.jpeg")),
 
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10),
-                                              child: SizedBox(
-                                                height: 80,
-                                                width: 170,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 4.0),
-                                                      child: SizedBox(
-                                                        height: 32,
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .centerLeft,
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10),
+                                                  child: SizedBox(
+                                                    height: 80,
+                                                    width: 170,
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 4.0),
+                                                          child: SizedBox(
+                                                            height: 32,
+                                                            child: Align(
+                                                              alignment: Alignment
+                                                                  .centerLeft,
+                                                              child: Text(
+                                                                car["carname"],
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                maxLines: 2,
+                                                                style: TextStyle(
+                                                                    color:
+                                                                        color,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                                // textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 4.0),
                                                           child: Text(
-                                                            car["carname"],
+                                                            '${car['kilometers']} + ${car['fuel']} + ${car['transmission']}',
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
                                                             maxLines: 2,
                                                             style: TextStyle(
                                                                 color: color,
+                                                                fontSize: 10,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold),
-                                                            // textAlign: TextAlign.center,
                                                           ),
                                                         ),
-                                                      ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 4.0),
+                                                          child: Text(
+                                                              formatAmountInRupees(
+                                                                  double.parse(car[
+                                                                      'price'])),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                        )
+                                                      ],
                                                     ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 4.0),
-                                                      child: Text(
-                                                        '${car['kilometers']} + ${car['fuel']} + ${car['transmission']}',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        maxLines: 2,
-                                                        style: TextStyle(
-                                                            color: color,
-                                                            fontSize: 10,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 4.0),
-                                                      child: Text(
-                                                          formatAmountInRupees(
-                                                              double.parse(car[
-                                                                  'price'])),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            )
-                                          ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                  // ),
-                                );
-                              }),
+                                      // ),
+                                    );
+                                  }),
                         ),
                       ),
                       Positioned(
@@ -379,6 +450,7 @@ class _HomeState extends State<Home> {
                         right: 16.0,
                         child: FloatingActionButton(
                           onPressed: () {
+                            // getcar();
                             _refreshIndicatorKey.currentState?.show();
                           },
                           child: const Icon(Icons.refresh),

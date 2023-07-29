@@ -135,6 +135,7 @@ class _CardetailsState extends State<Cardetails> {
     await Share.share(textToShare);
   }
 
+  // ignore: unused_field
   late double? _progress;
 
   Future<void> _downloadImage() async {
@@ -160,12 +161,14 @@ class _CardetailsState extends State<Cardetails> {
         }
       } on Exception catch (e) {
         logger.d(e);
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error downloading image.')),
         );
       }
     } else {
       // Permission denied. Handle this situation accordingly.
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Storage permission not granted')),
       );
