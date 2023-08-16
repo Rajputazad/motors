@@ -139,7 +139,7 @@ class _CardetailsState extends State<Cardetails> {
   late double? _progress;
 
   Future<void> _downloadImage() async {
-    if (await Permission.storage.request().isGranted) {
+    if (await Permission.storage.request().isGranted ||await Permission.photos.request().isGranted) {
       // Permission granted. You can now save files to external storage.
       //  logger.d(images[0]);
       try {
@@ -204,7 +204,7 @@ class _CardetailsState extends State<Cardetails> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    SelectableText(
                       cardetals["carname"],
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20),
@@ -255,7 +255,7 @@ class _CardetailsState extends State<Cardetails> {
                         child: SizedBox(
                           child: Row(
                             children: [
-                              Text(
+                              SelectableText(
                                 formatAmountInRupees(
                                     double.parse(cardetals["price"])),
                                 style: const TextStyle(
@@ -263,6 +263,24 @@ class _CardetailsState extends State<Cardetails> {
                               ),
                               // Spacer(),
                               const SizedBox(width: 50),
+                              IconButton(
+                                icon: const Icon(Icons.location_on),
+                                color: Colors.red,
+                                onPressed: () async {
+                                  var latitude = '37.7749';
+                                  var longitude = '-122.4194';
+                                  final url =
+                                      'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+
+                                  // ignore: deprecated_member_use
+                                  if (await canLaunch(url)) { 
+                                    // ignore: deprecated_member_use
+                                    await launch(url);
+                                  } else {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                              ),
                               IconButton(
                                 icon: const Icon(Icons
                                     .file_download), // Use the appropriate download icon
@@ -377,7 +395,7 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.center,
-                                                child: Text(
+                                                child: SelectableText(
                                                     "${cardetals["kilometers"]}KM"))
                                           ]),
                                     ),
@@ -419,8 +437,8 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.centerLeft,
-                                                child:
-                                                    Text(cardetals["service"]))
+                                                child: SelectableText(
+                                                    cardetals["service"]))
                                           ]),
                                     ),
                                   ),
@@ -455,7 +473,7 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.centerLeft,
-                                                child: Text(
+                                                child: SelectableText(
                                                     cardetals["registration"]))
                                           ]),
                                     ),
@@ -495,7 +513,8 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.centerLeft,
-                                                child: Text(cardetals["owner"]))
+                                                child: SelectableText(
+                                                    cardetals["owner"]))
                                           ]),
                                     ),
                                   ),
@@ -530,7 +549,8 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.centerLeft,
-                                                child: Text(cardetals["fuel"]))
+                                                child: SelectableText(
+                                                    cardetals["fuel"]))
                                           ]),
                                     ),
                                   ),
@@ -567,7 +587,7 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.centerLeft,
-                                                child: Text(
+                                                child: SelectableText(
                                                     cardetals["numberplate"]))
                                           ]),
                                     ),
@@ -601,7 +621,7 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.centerLeft,
-                                                child: Text(
+                                                child: SelectableText(
                                                     cardetals["transmission"]))
                                           ]),
                                     ),
@@ -639,7 +659,7 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.centerLeft,
-                                                child: Text(
+                                                child: SelectableText(
                                                     cardetals["insurance"]))
                                           ]),
                                     ),
@@ -673,7 +693,7 @@ class _CardetailsState extends State<Cardetails> {
                                             ),
                                             Align(
                                                 // alignment: Alignment.centerLeft,
-                                                child: Text(
+                                                child: SelectableText(
                                                     cardetals["description"]))
                                           ]),
                                     ),

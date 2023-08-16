@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
   }
 
   late bool add = true;
-  late bool content;
+  late bool content = false;
 
   final ScrollController _scrollController = ScrollController();
   void _scrollListener() async {
@@ -94,7 +94,11 @@ class _HomeState extends State<Home> {
 
           cardata = cardata + jsonData.cast<Map<String, dynamic>>();
           // cardata = cardata.reversed.toList();
-
+          if (cardata.isEmpty && page == 1) {
+            nodata = true;
+          } else {
+            nodata = false;
+          }
           if (data["data"].length == 0) {
             setState(() {
               add = false;
@@ -115,7 +119,9 @@ class _HomeState extends State<Home> {
       // ignore: use_build_context_syn'chronously
       ScaffoldMessenger.of(context).showSnackBar(
         // ignore: prefer_interpolation_to_compose_strings
-        const SnackBar(content: Text("Please check your internet connection and restart the app.")),
+        const SnackBar(
+            content: Text(
+                "Please check your internet connection and restart the app.")),
       );
       logger.d(e);
     }
@@ -177,14 +183,18 @@ class _HomeState extends State<Home> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Uday Motors",
-                    style: TextStyle(fontSize: 20, color: color),
+                  child: SizedBox(
+                    width: 155,
+                    child: Text(
+                      "Gajanand motors",
+                      style: TextStyle(fontSize: 20, color: color),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 // Spacer(),
                 Container(
-                  constraints: const BoxConstraints(maxWidth: 200.0),
+                  constraints: const BoxConstraints(maxWidth: 180.0),
                   height: 35,
                   child: TextField(
                     controller: _search,
@@ -246,10 +256,11 @@ class _HomeState extends State<Home> {
                           onRefresh: () async {
                             // Replace this delay with the code to be executed during refresh
                             // and return a Future when code finishes execution.
-                            nodata = false;
-
-                            cardata = [];
-                            page = 1;
+                            setState(() {
+                              nodata = false;
+                              cardata = [];
+                              page = 1;
+                            });
                             await getcars();
                             // return Future<void>.delayed(const Duration(seconds: 3));
                           },
@@ -306,7 +317,7 @@ class _HomeState extends State<Home> {
                                           child: SizedBox(
                                             // color: Colors.amber,
                                             width: 410,
-                                            height: 80,
+                                            height: 100,
                                             // child: Expanded(
                                             child: Row(
                                               children: [
@@ -336,7 +347,7 @@ class _HomeState extends State<Home> {
                                                         ),
                                                       )
                                                     : SizedBox(
-                                                        height: 80,
+                                                        height: 100,
                                                         width: 141,
                                                         child: ClipRRect(
                                                           borderRadius:
@@ -349,7 +360,10 @@ class _HomeState extends State<Home> {
                                                               ? Image.network(
                                                                   car["imagedetails"]
                                                                           [0]
-                                                                      ["url"])
+                                                                      ["url"],
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                )
                                                               : Image.asset(
                                                                   'assets/images/1.jpeg'), // Replace with your image asset path
                                                         ),
