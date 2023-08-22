@@ -46,7 +46,7 @@ class _HomeState extends State<Home> {
   bool showContainer = true;
 
   void dely() {
-    Future.delayed(const Duration(seconds: 8), () {
+    Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         showContainer = false;
       });
@@ -116,7 +116,7 @@ class _HomeState extends State<Home> {
       setState(() {
         loding = true;
       });
-      // ignore: use_build_context_syn'chronously
+      // ignore: use_build_context_syn'chronously, use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         // ignore: prefer_interpolation_to_compose_strings
         const SnackBar(
@@ -322,7 +322,9 @@ class _HomeState extends State<Home> {
                                             child: Row(
                                               children: [
                                                 showContainer
-                                                    ? Expanded(
+                                                    ? SizedBox(
+                                                        height: 100,
+                                                        width: 141,
                                                         child:
                                                             Shimmer.fromColors(
                                                           baseColor:
@@ -385,7 +387,7 @@ class _HomeState extends State<Home> {
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .only(
+                                                                  .only(
                                                                   top: 4.0),
                                                           child: SizedBox(
                                                             height: 32,
@@ -412,7 +414,7 @@ class _HomeState extends State<Home> {
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .only(
+                                                                  .only(
                                                                   top: 4.0),
                                                           child: Text(
                                                             '${car['kilometers']} + ${car['fuel']} + ${car['transmission']}',
@@ -431,7 +433,7 @@ class _HomeState extends State<Home> {
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .only(
+                                                                  .only(
                                                                   top: 4.0),
                                                           child: Text(
                                                               formatAmountInRupees(
