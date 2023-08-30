@@ -42,9 +42,9 @@ dynamic dialog(BuildContext context, String title, String number) async {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(
-                            width: 8,
+                            width: 7,
                           ),
-                          const Text("+919998497224"),
+                          const SelectableText("+919998497224"),
                           IconButton(
                             onPressed: () {
                               Navigator.of(context).pop(
@@ -63,17 +63,20 @@ dynamic dialog(BuildContext context, String title, String number) async {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const Text(
-                            "Manoj B. Rajput:",
+                            "Chetan patel:",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(
                             width: 8,
                           ),
-                          const Text("+919998497224"),
+                          const SelectableText("+919898750901"),
+                          const SizedBox(
+                            width: 16,
+                          ),
                           IconButton(
                             onPressed: () {
                               Navigator.of(context).pop(
-                                  "+919998497224"); // Replace the phone number with the desired number
+                                  "+919898750901"); // Replace the phone number with the desired number
                             },
                             icon: const Icon(Icons.phone),
                             color: Colors.green,
@@ -88,17 +91,20 @@ dynamic dialog(BuildContext context, String title, String number) async {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const Text(
-                            "Manoj B. Rajput:",
+                            "Manoj patel:",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(
                             width: 8,
                           ),
-                          const Text("+919998497224"),
+                          const SelectableText("+917096991347"),
+                          const SizedBox(
+                            width: 17,
+                          ),
                           IconButton(
                             onPressed: () {
                               Navigator.of(context).pop(
-                                  "+919998497224"); // Replace the phone number with the desired number
+                                  "+917096991347"); // Replace the phone number with the desired number
                             },
                             icon: const Icon(Icons.phone),
                             color: Colors.green,

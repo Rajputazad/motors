@@ -263,20 +263,23 @@ class _CardetailsState extends State<Cardetails> {
                       child: SizedBox(
                         child: Row(
                           children: [
-                            SelectableText(
-                              formatAmountInRupees(
-                                  double.parse(cardetals["price"])),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20),
+                            SizedBox(
+                              width: 150,
+                              child: SelectableText(
+                                formatAmountInRupees(
+                                    double.parse(cardetals["price"])),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
+                              ),
                             ),
                             // Spacer(),
-                            const SizedBox(width: 50),
+                            // const SizedBox(width: 50),
                             IconButton(
                               icon: const Icon(Icons.location_on),
                               color: Colors.red,
                               onPressed: () async {
-                                var latitude = '37.7749';
-                                var longitude = '-122.4194';
+                                var latitude = '23.0090583';
+                                var longitude = '72.6691394';
                                 final url =
                                     'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
 
@@ -755,7 +758,9 @@ class _CardetailsState extends State<Cardetails> {
                       dynamic result = await dialog(context, title, number);
                       // await dialog(context, title, number);
                       // String telephoneNumber = '+2347012345678';
-                      if (result == "+919998497224") {
+                      if (result == "+919998497224" ||
+                          result == "+919898750901" ||
+                          result == "+917096991347") {
                         String telephoneUrl = "tel:$result";
                         // ignore: deprecated_member_use
                         if (await canLaunch(telephoneUrl)) {
