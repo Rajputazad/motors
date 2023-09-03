@@ -26,10 +26,10 @@ class _HomeState extends State<Home> {
   final color = const Color.fromARGB(255, 0, 102, 185);
   @override
   void initState() {
-    getcars();
-    dely();
     _scrollController.addListener(_scrollListener);
     super.initState();
+    getcars();
+    
   }
 
   @override
@@ -63,54 +63,63 @@ class _HomeState extends State<Home> {
         _scrollController.position.maxScrollExtent) {
       if (add == true) {
         page++;
-      }
-      // logger.d(page);
-      setState(() {
-        // height = 130;
-      });
       await getcars();
-
       setState(() {
         content = false;
         // height = 80;
       });
+      }
+      // logger.d(page);
+      // setState(() {
+      //   // height = 130;
+      // });
+
     }
   }
 
   int page = 1;
-  Future getcars() async {
+  Future<void> getcars() async {
     try {
+      
       var pag = page.toString();
       var url = Uri.parse(apiurl + getcar + pag);
 
-      logger.d(url);
+      // logger.d(url);
       var result = await http.get(url);
-      if (result.statusCode == 200) {
         var data = jsonDecode(result.body);
-
+      if (result.statusCode == 200) {
         setState(() {
           loding = false;
           var jsonData = data["data"];
 
           cardata = cardata + jsonData.cast<Map<String, dynamic>>();
+           nodata = cardata.isEmpty && page == 1;
+          add = data["data"].isNotEmpty;
           // cardata = cardata.reversed.toList();
-          if (cardata.isEmpty && page == 1) {
-            nodata = true;
-          } else {
-            nodata = false;
-          }
-          if (data["data"].length == 0) {
-            setState(() {
-              add = false;
-            });
-          } else {
-            setState(() {
-              add = true;
-            });
+          // if (cardata.isEmpty && page == 1) {
+          //   setState(() {
+          //   nodata = true;
+              
+          //   });
+          // } else {
+          //   setState(() {
+          //   nodata = false;
+              
+          //   });
+          // }
+          // if (data["data"].length == 0) {
+          //   setState(() {
+          //     add = false;
+          //   });
+          // } else {
+          //   setState(() {
+          //     add = true;
+          //   });
 
-            // logger.d(data["data"].length == 0);
-          }
+          //   // logger.d(data["data"].length == 0);
+          // }
         });
+dely();
       }
     } on Exception catch (e) {
       setState(() {
@@ -119,9 +128,8 @@ class _HomeState extends State<Home> {
       // ignore: use_build_context_syn'chronously, use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         // ignore: prefer_interpolation_to_compose_strings
-        const SnackBar(
-            content: Text(
-                "Please check your internet connection and restart the app.")),
+       SnackBar(
+            content: Text(e.toString())),
       );
       logger.d(e);
     }
