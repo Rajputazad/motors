@@ -23,13 +23,12 @@ class _HomeState extends State<Home> {
   final apiurl = dotenv.get('API_URL');
   final getcar = dotenv.get('API_URL_GET');
   final getsearch = dotenv.get('API_URL_SEARCH');
-  final color = const Color.fromARGB(255, 0, 102, 185);
+  // final color = const Color.fromARGB(255, 0, 102, 185);
   @override
   void initState() {
     _scrollController.addListener(_scrollListener);
     super.initState();
     getcars();
-    
   }
 
   @override
@@ -63,48 +62,46 @@ class _HomeState extends State<Home> {
         _scrollController.position.maxScrollExtent) {
       if (add == true) {
         page++;
-      await getcars();
-      setState(() {
-        content = false;
-        // height = 80;
-      });
+        await getcars();
+        setState(() {
+          content = false;
+          // height = 80;
+        });
       }
       // logger.d(page);
       // setState(() {
       //   // height = 130;
       // });
-
     }
   }
 
   int page = 1;
   Future<void> getcars() async {
     try {
-      
       var pag = page.toString();
       var url = Uri.parse(apiurl + getcar + pag);
 
       // logger.d(url);
       var result = await http.get(url);
-        var data = jsonDecode(result.body);
+      var data = jsonDecode(result.body);
       if (result.statusCode == 200) {
         setState(() {
           loding = false;
           var jsonData = data["data"];
 
           cardata = cardata + jsonData.cast<Map<String, dynamic>>();
-           nodata = cardata.isEmpty && page == 1;
+          nodata = cardata.isEmpty && page == 1;
           add = data["data"].isNotEmpty;
           // cardata = cardata.reversed.toList();
           // if (cardata.isEmpty && page == 1) {
           //   setState(() {
           //   nodata = true;
-              
+
           //   });
           // } else {
           //   setState(() {
           //   nodata = false;
-              
+
           //   });
           // }
           // if (data["data"].length == 0) {
@@ -119,7 +116,7 @@ class _HomeState extends State<Home> {
           //   // logger.d(data["data"].length == 0);
           // }
         });
-dely();
+        dely();
       }
     } on Exception catch (e) {
       setState(() {
@@ -128,8 +125,7 @@ dely();
       // ignore: use_build_context_syn'chronously, use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         // ignore: prefer_interpolation_to_compose_strings
-       SnackBar(
-            content: Text(e.toString())),
+        SnackBar(content: Text(e.toString())),
       );
       logger.d(e);
     }
@@ -141,7 +137,7 @@ dely();
   search() async {
     //  loding = false;
     content = false;
-    logger.d(_search.text);
+    // logger.d(_search.text);
     try {
       var uri = Uri.parse(apiurl + getsearch + _search.text);
       var res = await http.get(uri);
@@ -157,10 +153,10 @@ dely();
           } else {
             nodata = false;
           }
-          logger.d(cardata);
+          // logger.d(cardata);
         });
       } else {
-        logger.d(res.body);
+        // logger.d(res.body);
         // cardata = [];
         // page = 1;
         _refreshIndicatorKey.currentState?.show();
@@ -177,12 +173,16 @@ dely();
       GlobalKey<RefreshIndicatorState>();
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = Theme.of(context).brightness;
+    final Color color = brightness == Brightness.light
+        ? const Color.fromARGB(255, 0, 102, 185)
+        : Colors.white;
     final screenHeight = MediaQuery.of(context).size.height;
     // final listViewHeight = screenHeight - 80;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(
-            255, 255, 255, 255), // Replace with your desired app bar color
+        // backgroundColor: const Color.fromARGB(
+        //     255, 255, 255, 255), // Replace with your desired app bar color
         // title: const Text('My App'),
         elevation: 0.1,
         actions: [

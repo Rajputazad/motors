@@ -185,11 +185,16 @@ class _CardetailsState extends State<Cardetails> {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = Theme.of(context).brightness;
+    final Color containerColor =
+        brightness == Brightness.light ? Colors.white : Colors.black;
+    final Color logo =
+        brightness == Brightness.light ? Colors.black : Colors.white;
     // return FutureBuilder(builder: (context, snapshot) {
     if (loding == true) {
       // While the future is still loading
       return Container(
-          decoration: const BoxDecoration(color: Colors.white),
+          decoration: BoxDecoration(color: containerColor),
           child: Center(
             child: LoadingAnimationWidget.threeRotatingDots(
               color: color,
@@ -199,9 +204,9 @@ class _CardetailsState extends State<Cardetails> {
     } else {
       return Scaffold(
         appBar: AppBar(
-          foregroundColor: Colors.black,
-          backgroundColor: const Color.fromARGB(
-              255, 255, 255, 255), // Replace with your desired app bar color
+          // foregroundColor: Colors.black,
+          // backgroundColor: const Color.fromARGB(
+          //     255, 255, 255, 255), // Replace with your desired app bar color
           // title: const Text('My App'),
           elevation: 0.1,
           actions: [
@@ -350,8 +355,9 @@ class _CardetailsState extends State<Cardetails> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                Icon(Icons.directions_car,
-                                                    color: Colors.black),
+                                                Icon(
+                                                  Icons.directions_car,
+                                                ),
                                                 SizedBox(width: 8.0),
                                                 Text(
                                                   "Model",
@@ -386,20 +392,18 @@ class _CardetailsState extends State<Cardetails> {
                                                 Container(
                                                   width: 20,
                                                   height: 20,
-                                                  decoration:
-                                                      const BoxDecoration(
+                                                  decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
-                                                    color: Color.fromARGB(
-                                                        255, 0, 0, 0),
+                                                    color: logo,
                                                   ),
-                                                  child: const Center(
+                                                  child: Center(
                                                     child: Text(
                                                       'km',
                                                       style: TextStyle(
                                                         // fontSize: 24,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        color: Colors.white,
+                                                        color: containerColor,
                                                       ),
                                                     ),
                                                   ),
@@ -734,7 +738,7 @@ class _CardetailsState extends State<Cardetails> {
             bottom: 0.0,
             // right: 100.0,
             child: Container(
-              color: Colors.white,
+              color: containerColor,
               width: MediaQuery.of(context).size.width,
               height: 90,
               child: Center(
